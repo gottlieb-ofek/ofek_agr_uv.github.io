@@ -8,7 +8,18 @@ const player = {
   color: 'blue'
 };
 
-let blobs = [];  // now will hold country blobs
+const blobs = [];
+const blobCount = 10;
+
+// Create random "country blobs"
+for(let i=0; i<blobCount; i++){
+  blobs.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: 10 + Math.random()*20,
+    color: 'green'
+  });
+}
 
 let mouse = {x: canvas.width/2, y: canvas.height/2};
 
@@ -28,21 +39,6 @@ canvas.addEventListener('touchmove', e => {
   }
 }, {passive:false});
 
-// --- LOAD COUNTRIES JSON ---
-fetch('countries.json')
-  .then(response => response.json())
-  .then(data => {
-    // Create country blobs
-    blobs = data.map(c => ({
-      name: c.name,
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.sqrt(c.size) * 0.002, // scale to canvas, adjust factor
-      color: c.color
-    }));
-  })
-  .catch(err => console.error("Failed to load countries:", err));
-
 // Update function
 function update(){
   // Move player toward mouse
@@ -59,6 +55,8 @@ function update(){
       if(player.r > b.r){ // eat smaller
         player.r += b.r*0.2;
         blobs.splice(i,1);
+      } else { // smaller blob blocks or optional game over
+        // do nothing for now
       }
     }
   }
@@ -74,11 +72,6 @@ function draw(){
     ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
     ctx.fillStyle = b.color;
     ctx.fill();
-
-    // Draw country name
-    ctx.fillStyle = "black";
-    ctx.font = "12px Arial";
-    ctx.fillText(b.name, b.x - b.r/2, b.y);
   }
 
   // Draw player
