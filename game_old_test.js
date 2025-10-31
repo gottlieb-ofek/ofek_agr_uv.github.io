@@ -16,7 +16,7 @@ for(let i=0; i<blobCount; i++){
   blobs.push({
     x: Math.random()*canvas.width,
     y: Math.random()*canvas.height,
-    r: 10 + Math.random()*20,
+    r: 10 + Math.random()*30,
     color: 'green'
   });
 }
