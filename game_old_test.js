@@ -11,15 +11,41 @@ const player = {
 const blobs = [];
 const blobCount = 10;
 
-// Create random "country blobs"
-for(let i=0; i<blobCount; i++){
-  blobs.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    r: 10 + Math.random()*30,
-    color: 'green'
-  });
+function drawCurvedLabel(ctx, text, x, y, radius) {
+  radius = 30;
+  const letters = text.split("");
+  const arcRadius = 2*radius;      // how far above circle
+  const arcWidth = Math.PI / 3;       // how wide the curve is (30°)
+  const startAngle = -arcWidth / 2;
+
+  for (let i = 0; i < letters.length; i++) {
+    const angle = startAngle + (i / (letters.length - 1)) * arcWidth;
+
+    const lx = x + arcRadius * Math.cos(angle - Math.PI / 2);
+    const ly = y + arcRadius * Math.sin(angle - Math.PI / 2);
+
+    ctx.fillText(letters[i], lx, ly);
+  }
 }
+
+
+fetch('countries.json')
+  .then(response => response.json())
+  .then(countries => {
+    for (let c of countries) {
+      blobs.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: c.size / 5000,
+        color: c.color,
+        name: c.name,
+        size: c.size
+      });
+    }
+
+    // ✅ you can now use blobs[] (draw them, print, etc)
+    console.log(blobs);
+  });
 
 let mouse = {x: canvas.width/2, y: canvas.height/2};
 
@@ -72,6 +98,10 @@ function draw(){
     ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
     ctx.fillStyle = b.color;
     ctx.fill();
+
+    ctx.fillStyle = "black";
+    ctx.font = "12px Arial";
+    drawCurvedLabel(ctx, b.name, b.x, b.y, b.r + 8);
   }
 
   // Draw player
